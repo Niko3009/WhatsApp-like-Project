@@ -1,19 +1,13 @@
 import styled from 'styled-components'
 
 export const Wrapper = styled('div')`
-    width: 100%;
-    padding-left: calc((100% - 1160px) / 2);
-    padding-right: calc((100% - 1160px) / 2);
+    height: 100vh;
+    width: 100vw;
 
-    margin-top: 40px;
-    margin-bottom: 40px;
-
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: center;
-
-    gap: 40px;
+    background-image: url('/img/backgrounds/bg (4).jpg');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
 
     overflow: hidden;
 `
