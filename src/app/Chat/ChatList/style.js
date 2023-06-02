@@ -38,7 +38,7 @@ export const Row = styled('div')`
     display: flex;
     flex-direction: row;
     justify-content: ${(props) =>
-        props.data.type === 'outgoing' ? `flex-start` : `flex-end`};
+        props.data.type === 'outgoing' ? `flex-end` : `flex-start`};
 `
 
 export const Cloud = styled('div')`

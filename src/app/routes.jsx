@@ -18,7 +18,10 @@ export default () => {
 }
 
 const RouteProtector = ({ redirectPath = '/' }) => {
-    const { idInstance, apiTokenInstance, phoneNumber } = localStorage
+    const idInstance = localStorage.getItem('idInstance')
+    const apiTokenInstance = localStorage.getItem('apiTokenInstance')
+    const phoneNumber = localStorage.getItem('phoneNumber')
+
     const isAllowed = idInstance && apiTokenInstance && phoneNumber
     return isAllowed ? <Outlet /> : <Navigate to={redirectPath} replace />
 }

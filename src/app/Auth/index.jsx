@@ -4,26 +4,44 @@ import { useState, useEffect } from 'react'
 import { DOMAIN, SENDING_FEATURES_URL } from 'data/api'
 
 import * as Styled from './style'
-import { useLogIn } from './hooks'
+import { doDataCheck } from './api'
 
 export default () => {
     const [formState, setFormState] = useState({ query: false, message: '' })
     const navigate = useNavigate()
 
-    const data = { idInstance: '', apiTokenInstance: '', phoneNumber: '' }
-    for (const [key, keyItem] of Object.entries(data)) {
-        data[key] = { initValue: data[key] }
-        ;[data[key].value, data[key].setValue] = useState(keyItem)
+    const [idInstance, setIdInstance] = useState('')
+    const [apiTokenInstance, setApiTokenInstance] = useState('')
+    const [phoneNumber, setPhoneNumber] = useState('')
+
+    const doLogIn = async () => {
+        localStorage.clear()
+
+        const data = { idInstance, apiTokenInstance, phoneNumber }
+
+        const isInstanceValid =
+            idInstance.match(/[0-9]{10}/)?.index === 0 &&
+            idInstance.toString().length === 10
+        if (!isInstanceValid)
+            return setFormState({ message: 'Формат данных аккаунта не верен' })
+
+        const isPhoneValid =
+            phoneNumber.match(/[7]{1}[0-9]{10}/)?.index === 0 &&
+            phoneNumber.toString().length === 11
+        if (!isPhoneValid)
+            return setFormState({ message: 'Формат телефона не верен' })
+
+        const error = await doDataCheck(data)
+        if (error) {
+            setFormState({ message: error })
+        } else {
+            for (const key in data) localStorage.setItem(key, data[key])
+            navigate(`/chat`)
+        }
     }
 
-    const useSuccessCall = () => navigate(`/chat`)
-    const useErrorCall = (error) => setFormState({ message: error })
-
     useEffect(() => {
-        if (formState.query) useLogIn(data, useSuccessCall, useErrorCall)
-
-        let id = window.setTimeout(function () {}, 0)
-        while (id--) window.clearTimeout(id)
+        if (formState.query) doLogIn()
     }, [formState])
 
     return (
@@ -39,20 +57,16 @@ export default () => {
                     <h3>Уникальный номер аккаунта:</h3>
                     <Styled.Input
                         type="number"
-                        value={data.idInstance.value}
-                        onChange={(e) =>
-                            data.idInstance.setValue(e.target.value)
-                        }
+                        value={idInstance}
+                        onChange={(e) => setIdInstance(e.target.value)}
                     />
                 </Styled.Item>
                 <Styled.Item>
-                    <h3>Уникальный номер аккаунта:</h3>
+                    <h3>Ключ доступа аккаунта:</h3>
                     <Styled.Input
                         type="text"
-                        value={data.apiTokenInstance.value}
-                        onChange={(e) =>
-                            data.apiTokenInstance.setValue(e.target.value)
-                        }
+                        value={apiTokenInstance}
+                        onChange={(e) => setApiTokenInstance(e.target.value)}
                     />
                 </Styled.Item>
 
@@ -61,10 +75,8 @@ export default () => {
                     <Styled.Input
                         type="number"
                         placeholder="7-XXX-XXX-XX-XX"
-                        value={data.phoneNumber.value}
-                        onChange={(e) =>
-                            data.phoneNumber.setValue(e.target.value)
-                        }
+                        value={phoneNumber}
+                        onChange={(e) => setPhoneNumber(e.target.value)}
                     />
                 </Styled.Item>
                 <h3>

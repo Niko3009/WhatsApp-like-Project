@@ -4,18 +4,18 @@ import * as Styled from './style'
 
 export default ({ chatHistory }) => {
     const chatRef = useRef()
-    if (!Array.isArray(chatHistory.value)) chatHistory.value = []
+    if (!Array.isArray(chatHistory)) chatHistory = []
 
     useEffect(() => {
         const chat = chatRef.current
         chat.scrollTop = chat.scrollHeight
-    }, [chatHistory.value.length])
+    }, [chatHistory.length])
 
     return (
         <Styled.Wrapper ref={chatRef}>
             <div>
                 <Styled.List>
-                    {chatHistory.value
+                    {chatHistory
                         .map((messageData) => (
                             <Message
                                 data={messageData}
@@ -44,8 +44,8 @@ const Message = ({ data }) => {
     }
 
     return (
-        <Styled.Row {...{ data }}>
-            <Styled.Cloud {...{ data }}>
+        <Styled.Row data={data}>
+            <Styled.Cloud data={data}>
                 <h1>{data.textMessage}</h1>
                 <p>{time(new Date(data.timestamp))}</p>
             </Styled.Cloud>

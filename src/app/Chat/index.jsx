@@ -5,61 +5,70 @@ import { IoSend as SendArrow } from 'react-icons/io5'
 
 import * as Styled from './style'
 import {
-    useGetChatHistory,
-    useSendMessage,
-    useCheckReceiveNotification,
-} from './hooks'
+    doGetChatHistory,
+    doSendMessage,
+    doCheckReceiveNotification,
+} from './api'
 
 import Header from './Header'
 import ChatList from './ChatList'
 
 export default () => {
-    const data = {
-        chatHistory: [],
-        draftMessage: '',
+    const [chatHistory, setChatHistory] = useState([])
+    const [draftMessage, setDraftMessage] = useState('')
+
+    const chatData = {
+        idInstance: localStorage.getItem('idInstance'),
+        apiTokenInstance: localStorage.getItem('apiTokenInstance'),
+        phoneNumber: localStorage.getItem('phoneNumber'),
     }
 
-    for (const key in data) data[key] = { initValue: data[key] }
-    for (const key in data)
-        [data[key].value, data[key].setValue] = useState(data[key].initValue)
-
-    const chatData = { ...localStorage }
-    const useUpdateChatHistory = () =>
-        useGetChatHistory(data.chatHistory, chatData)
-
-    const useCheck = () =>
-        setTimeout(() => {
-            useCheckReceiveNotification(chatData, useUpdateChatHistory)
-            useCheck()
-        }, 5 * 1000)
+    const doUpdateChatHistory = async () => {
+        const newChatHistory = await doGetChatHistory(chatData)
+        if (newChatHistory) setChatHistory(newChatHistory)
+    }
 
     useEffect(() => {
-        useUpdateChatHistory()
-        useCheck()
+        doUpdateChatHistory()
+
+        const intervalID = setInterval(async () => {
+            const response = await doCheckReceiveNotification(chatData)
+            if (response.typeWebhook === 'incomingMessageReceived') {
+                doUpdateChatHistory()
+            }
+        }, 5 * 1000)
+
+        return () => {
+            clearInterval(intervalID)
+        }
     }, [])
 
     return (
         <Styled.Wrapper>
-            <Header {...{ chatData }} />
+            <Header chatData={chatData} />
 
-            <ChatList chatHistory={data.chatHistory} />
+            <ChatList chatHistory={chatHistory} />
 
             <Styled.MessageFooter>
                 <Styled.Input
-                    value={data.draftMessage.value}
-                    onChange={(e) => data.draftMessage.setValue(e.target.value)}
+                    value={draftMessage}
+                    onChange={(e) => setDraftMessage(e.target.value)}
                     type="text"
                     placeholder="Введите сообщение..."
                 />
+
                 <Styled.Button
-                    onClick={() =>
-                        useSendMessage(
-                            data.draftMessage,
+                    onClick={async () => {
+                        const response = await doSendMessage(
                             chatData,
-                            useUpdateChatHistory
+                            draftMessage
                         )
-                    }
-                    disabled={!data.draftMessage.value}
+                        if (response) {
+                            setDraftMessage('')
+                            setTimeout(doUpdateChatHistory, 1000)
+                        }
+                    }}
+                    disabled={!draftMessage}
                 >
                     <IconContext.Provider
                         value={{ color: 'grey', size: '100%' }}
