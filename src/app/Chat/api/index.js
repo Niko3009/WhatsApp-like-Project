@@ -1,8 +1,11 @@
 import { API_HOST } from 'data/api'
 
-export const doSendMessage = async (chatData, message) => {
-    const { idInstance, apiTokenInstance, phoneNumber } = chatData
-
+export const sendMessage = async (
+    idInstance,
+    apiTokenInstance,
+    phoneNumber,
+    message
+) => {
     const sendMessage = fetch(
         `${API_HOST}/waInstance${idInstance}/sendMessage/${apiTokenInstance}`,
         {
@@ -22,9 +25,11 @@ export const doSendMessage = async (chatData, message) => {
     }
 }
 
-export const doGetChatHistory = async (chatData) => {
-    const { idInstance, apiTokenInstance, phoneNumber } = chatData
-
+export const doGetChatHistory = async (
+    idInstance,
+    apiTokenInstance,
+    phoneNumber
+) => {
     const sendMessage = fetch(
         `${API_HOST}/waInstance${idInstance}/getChatHistory/${apiTokenInstance}`,
         {
@@ -45,9 +50,10 @@ export const doGetChatHistory = async (chatData) => {
     }
 }
 
-export const doCheckReceiveNotification = async (chatData) => {
-    const { idInstance, apiTokenInstance } = chatData
-
+export const checkReceiveNotification = async (
+    idInstance,
+    apiTokenInstance
+) => {
     const sendMessage = fetch(
         `${API_HOST}/waInstance${idInstance}/receiveNotification/${apiTokenInstance}`
     )
@@ -57,20 +63,23 @@ export const doCheckReceiveNotification = async (chatData) => {
         if (promise.status !== 200) return
 
         const response = await promise.json()
+        if (response === null) return null
+
         const data = response?.body
-
-        doDeleteNotification(chatData, response)
-
+        doDeleteNotification(idInstance, apiTokenInstance, response?.receiptId)
         return data
     } catch (error) {
         return null
     }
 }
 
-export const doDeleteNotification = async (chatData, receipt) => {
-    const { idInstance, apiTokenInstance } = chatData
+export const doDeleteNotification = async (
+    idInstance,
+    apiTokenInstance,
+    receiptId
+) => {
     fetch(
-        `${API_HOST}/waInstance${idInstance}/deleteNotification/${apiTokenInstance}/${receipt?.receiptId}`,
+        `${API_HOST}/waInstance${idInstance}/deleteNotification/${apiTokenInstance}/${receiptId}`,
         {
             method: 'delete',
         }

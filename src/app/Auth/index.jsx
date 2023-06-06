@@ -22,14 +22,16 @@ export default () => {
         const isInstanceValid =
             idInstance.match(/[0-9]{10}/)?.index === 0 &&
             idInstance.toString().length === 10
-        if (!isInstanceValid)
+        if (!isInstanceValid) {
             return setFormState({ message: 'Формат данных аккаунта не верен' })
+        }
 
         const isPhoneValid =
             phoneNumber.match(/[7]{1}[0-9]{10}/)?.index === 0 &&
             phoneNumber.toString().length === 11
-        if (!isPhoneValid)
+        if (!isPhoneValid) {
             return setFormState({ message: 'Формат телефона не верен' })
+        }
 
         const error = await doDataCheck(data)
         if (error) {
@@ -41,7 +43,9 @@ export default () => {
     }
 
     useEffect(() => {
-        if (formState.query) doLogIn()
+        if (formState.query) {
+            doLogIn()
+        }
     }, [formState])
 
     return (

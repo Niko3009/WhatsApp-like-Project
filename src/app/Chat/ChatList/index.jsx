@@ -4,7 +4,6 @@ import * as Styled from './style'
 
 export default ({ chatHistory }) => {
     const chatRef = useRef()
-    if (!Array.isArray(chatHistory)) chatHistory = []
 
     useEffect(() => {
         const chat = chatRef.current
@@ -15,14 +14,12 @@ export default ({ chatHistory }) => {
         <Styled.Wrapper ref={chatRef}>
             <div>
                 <Styled.List>
-                    {chatHistory
-                        .map((messageData) => (
-                            <Message
-                                data={messageData}
-                                key={String(messageData.idMessage)}
-                            />
-                        ))
-                        .reverse()}
+                    {chatHistory.map((messageData) => (
+                        <Message
+                            data={messageData}
+                            key={String(messageData.idMessage)}
+                        />
+                    ))}
                 </Styled.List>
             </div>
         </Styled.Wrapper>
@@ -30,7 +27,9 @@ export default ({ chatHistory }) => {
 }
 
 const Message = ({ data }) => {
-    if (!data.textMessage) return
+    const { textMessage, type, timestamp } = data
+
+    if (!textMessage) return
 
     const time = (date) => {
         const hours = date.getHours()
@@ -44,10 +43,10 @@ const Message = ({ data }) => {
     }
 
     return (
-        <Styled.Row data={data}>
-            <Styled.Cloud data={data}>
-                <h1>{data.textMessage}</h1>
-                <p>{time(new Date(data.timestamp))}</p>
+        <Styled.Row type={type}>
+            <Styled.Cloud type={type}>
+                <h1>{textMessage}</h1>
+                <p>{time(new Date(timestamp))}</p>
             </Styled.Cloud>
         </Styled.Row>
     )

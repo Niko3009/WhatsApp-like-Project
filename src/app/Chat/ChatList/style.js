@@ -38,7 +38,7 @@ export const Row = styled('div')`
     display: flex;
     flex-direction: row;
     justify-content: ${(props) =>
-        props.data.type === 'outgoing' ? `flex-end` : `flex-start`};
+        props.type === 'outgoing' ? `flex-end` : `flex-start`};
 `
 
 export const Cloud = styled('div')`
@@ -48,7 +48,7 @@ export const Cloud = styled('div')`
     padding: 12px 24px;
     border-radius: 24px;
     background-color: ${(props) =>
-        props.data.type === 'outgoing' ? `green` : `blue`};
+        props.type === 'outgoing' ? `green` : `blue`};
 
     display: flex;
     flex-direction: column;

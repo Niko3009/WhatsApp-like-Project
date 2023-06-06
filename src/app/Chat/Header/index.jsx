@@ -7,17 +7,23 @@ import { BsArrowLeft as Arrow } from 'react-icons/bs'
 import * as Styled from './style'
 import { doGetContactInfo } from './api'
 
-export default ({ chatData }) => {
+export default ({ idInstance, apiTokenInstance, phoneNumber }) => {
     const navigate = useNavigate()
 
     const [contact, setContact] = useState({
         avatar: '/img/avatar_mock.jpg',
-        name: chatData.phoneNumber,
+        name: phoneNumber,
     })
 
     const doUpdateContactInfo = async () => {
-        const data = await doGetContactInfo(chatData)
-        if (data.name) setContact(data)
+        const data = await doGetContactInfo(
+            idInstance,
+            apiTokenInstance,
+            phoneNumber
+        )
+        if (data.name) {
+            setContact(data)
+        }
     }
 
     useEffect(() => {
