@@ -1,8 +1,10 @@
 import { API_HOST } from 'data/api'
 
-export const doGetContactInfo = async (chatData) => {
-    const { idInstance, apiTokenInstance, phoneNumber } = chatData
-
+export const doGetContactInfo = async (
+    idInstance,
+    apiTokenInstance,
+    phoneNumber
+) => {
     const sendMessage = fetch(
         `${API_HOST}/waInstance${idInstance}/getContactInfo/${apiTokenInstance}`,
         {

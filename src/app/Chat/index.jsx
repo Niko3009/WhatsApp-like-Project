@@ -4,11 +4,7 @@ import { IconContext } from 'react-icons'
 import { IoSend as SendArrow } from 'react-icons/io5'
 
 import * as Styled from './style'
-import {
-    doGetChatHistory,
-    doSendMessage,
-    doCheckReceiveNotification,
-} from './api'
+import { doGetChatHistory, sendMessage, checkReceiveNotification } from './api'
 
 import Header from './Header'
 import ChatList from './ChatList'
@@ -17,35 +13,56 @@ export default () => {
     const [chatHistory, setChatHistory] = useState([])
     const [draftMessage, setDraftMessage] = useState('')
 
-    const chatData = {
-        idInstance: localStorage.getItem('idInstance'),
-        apiTokenInstance: localStorage.getItem('apiTokenInstance'),
-        phoneNumber: localStorage.getItem('phoneNumber'),
-    }
+    const idInstance = localStorage.getItem('idInstance')
+    const apiTokenInstance = localStorage.getItem('apiTokenInstance')
+    const phoneNumber = localStorage.getItem('phoneNumber')
 
-    const doUpdateChatHistory = async () => {
-        const newChatHistory = await doGetChatHistory(chatData)
-        if (newChatHistory) setChatHistory(newChatHistory)
+    const updateChatHistory = async () => {
+        const responseHistory = await doGetChatHistory(
+            idInstance,
+            apiTokenInstance,
+            phoneNumber
+        )
+        if (Array.isArray(responseHistory)) {
+            const filteredHistory = responseHistory
+                .filter(function (message) {
+                    return message.idMessage !== undefined
+                })
+                .reverse()
+            setChatHistory(filteredHistory)
+        }
     }
 
     useEffect(() => {
-        doUpdateChatHistory()
+        updateChatHistory()
 
-        const intervalID = setInterval(async () => {
-            const response = await doCheckReceiveNotification(chatData)
-            if (response.typeWebhook === 'incomingMessageReceived') {
-                doUpdateChatHistory()
+        const delay = 3 * 1000
+        let timerId = setTimeout(async function request() {
+            const receiveNotification = await checkReceiveNotification(
+                idInstance,
+                apiTokenInstance
+            )
+            if (receiveNotification !== null) {
+                updateChatHistory()
             }
-        }, 5 * 1000)
+
+            if (timerId === null) return // если ответ от сервера придет после удаления компонента таймер будет запущен снова (см.стр.54)
+            timerId = setTimeout(request, delay)
+        }, delay)
 
         return () => {
-            clearInterval(intervalID)
+            clearTimeout(timerId)
+            timerId = null
         }
     }, [])
 
     return (
         <Styled.Wrapper>
-            <Header chatData={chatData} />
+            <Header
+                idInstance={idInstance}
+                apiTokenInstance={apiTokenInstance}
+                phoneNumber={phoneNumber}
+            />
 
             <ChatList chatHistory={chatHistory} />
 
@@ -59,13 +76,14 @@ export default () => {
 
                 <Styled.Button
                     onClick={async () => {
-                        const response = await doSendMessage(
-                            chatData,
+                        const response = await sendMessage(
+                            idInstance,
+                            apiTokenInstance,
+                            phoneNumber,
                             draftMessage
                         )
                         if (response) {
                             setDraftMessage('')
-                            setTimeout(doUpdateChatHistory, 1000)
                         }
                     }}
                     disabled={!draftMessage}
