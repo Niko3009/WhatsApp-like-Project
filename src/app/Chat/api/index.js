@@ -63,17 +63,19 @@ export const checkReceiveNotification = async (
         if (promise.status !== 200) return
 
         const response = await promise.json()
-        if (response === null) return null
+        if (response === null) {
+            return null
+        }
 
         const data = response?.body
-        doDeleteNotification(idInstance, apiTokenInstance, response?.receiptId)
+        deleteNotification(idInstance, apiTokenInstance, response.receiptId)
         return data
     } catch (error) {
         return null
     }
 }
 
-export const doDeleteNotification = async (
+export const deleteNotification = async (
     idInstance,
     apiTokenInstance,
     receiptId

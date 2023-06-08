@@ -21,9 +21,7 @@ export default ({ idInstance, apiTokenInstance, phoneNumber }) => {
             apiTokenInstance,
             phoneNumber
         )
-        if (data.name) {
-            setContact(data)
-        }
+        setContact(data)
     }
 
     useEffect(() => {

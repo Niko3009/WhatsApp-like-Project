@@ -21,16 +21,20 @@ export const doDataCheck = async ({
 
     try {
         const response = await getInstanceData
-        if (response.status !== 200) return `Ошибка запроса #${response.status}`
-        if (response.statusText !== 'OK')
+        if (response.status !== 200) {
+            return `Ошибка запроса #${response.status}`
+        }
+        if (response.statusText !== 'OK') {
             return `Пользователь с указанными данными не существует или не авторизован`
-
+        }
         const getPhoneDataResponse = await getPhoneData
-        if (getPhoneDataResponse.status !== 200)
+        if (getPhoneDataResponse.status !== 200) {
             return `Ошибка запроса #${getPhoneDataResponse.status}`
+        }
         const data = await getPhoneDataResponse.json()
-        if (!data?.existsWhatsapp)
+        if (!data?.existsWhatsapp) {
             return `Пользователь с таким Whatsapp не найден`
+        }
     } catch (error) {
         return 'Неизвестная ошибка,\n убедитесь в правильности данных'
     }

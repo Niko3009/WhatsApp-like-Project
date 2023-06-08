@@ -38,16 +38,16 @@ export default () => {
 
         const delay = 3 * 1000
         let timerId = setTimeout(async function request() {
-            const response = await checkReceiveNotification(
+            const receiveNotification = await checkReceiveNotification(
                 idInstance,
                 apiTokenInstance
             )
-            if (response) {
+            if (receiveNotification !== null) {
                 updateChatHistory()
             }
-            if (timerId) {
-                timerId = setTimeout(request, delay)
-            }
+
+            if (timerId === null) return // если ответ от сервера придет после удаления компонента таймер будет запущен снова (см.стр.54)
+            timerId = setTimeout(request, delay)
         }, delay)
 
         return () => {
